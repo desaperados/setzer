@@ -5,6 +5,12 @@
 ###
 ### Setzer: Query USD price feeds
 set -e
+OPTS="setzer [<options>] <command> [<args>]
+--
+  Options:
+F,from=address        account to send from
+keystore=dir          local keystore directory
+"
 
 if [[ $2 = --help ]]; then
   exec "${0##*/}" help "$1"
@@ -12,9 +18,28 @@ elif [[ $1 = -* ]] && command -v "${0##*/}-$1" &>/dev/null; then
   exec "${0##*/}-$1" "${@:2}"
 fi
 
-export SETZER_CACHE=${SETZER_CACHE:-~/.setzer}
+eval "$(git rev-parse --parseopt -- "$@" <<<"$OPTS" || echo exit $?)"
+
+while [[ $1 ]]; do
+  case $1 in
+    --)             shift; break;;
+    --keystore)     shift; export ETH_KEYSTORE=$1;;
+    -F|--from)      shift; export ETH_FROM=$1;;
+    *) printf "${0##*/}: unrecognised option: %q\n" "--$1"; exit 1
+  esac; shift
+done
+
+export SETZER_DIR=${SETZER_DIR:-$HOME/.setzer}
 export SETZER_CACHE_EXPIRY=${SETZER_CACHE_EXPIRY:-60}
 export SETZER_TIMEOUT=${SETZER_TIMEOUT:-10}
 export SETZER_MIN_MEDIAN=${SETZER_MIN_MEDIAN:-3}
+export SETZER_MSG_EXPIRY=${SETZER_MSG_EXPIRY:-900}
+export SETZER_BROADCAST_INTERVAL=${SETZER_BROADCAST_INTERVAL:-120}
+export SETZER_QUORUM=${SETZER_QUORUM:-10}
+
+export SETZER_CACHE="$SETZER_DIR/cache"
+export SETZER_PIDS="$SETZER_DIR/pids"
+
+ mkdir -p "$SETZER_PIDS"
 
 "${0##*/}-${1-help}" "${@:2}"

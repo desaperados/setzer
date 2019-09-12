@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+### setzer-ssb -- SSB Server
+set -e
+
+command -v ssb-server >/dev/null 2>&1 || {
+  echo >&2 "Error: ssb-server not installed.";
+  exit 1
+}
+
+log() { echo  "$1" >> "$SETZER_DIR/ssb.log"; }
+
+if [[ -z "$(pgrep -f "ssb-server start")" ]]; then
+  if [[ ! -e "$HOME/.$ssb_appname/config" ]]; then
+    setzer --ssb-conf > "$HOME/.$ssb_appname/config"
+  fi
+
+  nohup ssb-server start >> "$SETZER_DIR/ssb.log" 2>&1 &
+  log "Starting ssb-server [$ssb_appname] $!" && sleep 1
+fi
+
+case $1 in
+  id|public) {
+    ssb-server whoami
+  };;
+  server) {
+    ssb-server getAddress
+  };;
+  logs) {
+    tail -f "$HOME/.$ssb_appname/server.logs"
+  };;
+  stop) {
+    if [[ -n "$(pgrep -f "ssb-server start")" ]]; then
+      log "Stopping ssb-server [$ssb_appname]"
+      pkill -f "ssb-server start"
+    fi
+  };;
+  publish) {
+    pair=${2^^}; price=$3; src=$4
+
+    pairH=$(seth --to-bytes32 "$(seth --from-ascii "$pair")")
+    priceH=$(seth --to-word "$(seth --to-wei "$price" eth)")
+    timeH=$(seth --to-word "$(date +"%s")")
+    sig=$(setzer --sign "$(seth keccak "$priceH $timeH $pairH")") # match medianizer erecover
+
+    json=$(jq -n \
+      --arg tp "$pair" \
+      --arg sg "$sig" \
+      --arg pr "$price" \
+      --arg sr "$src" \
+      --arg dp "$priceH" \
+      --arg dt "$timeH" \
+      '{type: $tp, price: $pr, source: $sr, sig: $sg, data: { price: $dp, timestamp: $dt }}')
+
+    echo "$json" | ssb-server publish .
+  };;
+  latest) {
+    now=$(( $(date +'%s * 1000 + %-N / 1000000') ))
+    then=$(( now - ("$SETZER_MSG_EXPIRY" * 1000) ))
+    ssb-server messagesByType --type "$2" --gte "$then" --reverse
+  };;
+  last) {
+    now=$(( $(date +'%s * 1000 + %-N / 1000000') ))
+    then=$(( now - ("$SETZER_MSG_EXPIRY" * 1000) ))
+    logs="$(ssb-server messagesByType --type "$2" --gte "$then" --reverse)"
+    head -n 1 <(echo "$logs" | jq -c '.|.value') | jq '.'
+  };;
+  "") {
+    setzer help ssb
+  };;
+  *) {
+    ssb-server "$@"
+  };;
+esac

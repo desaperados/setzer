@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -e
+if [ -z "$ETH_FROM" ]; then
+  echo >&2 "Error: ETH_FROM not set; transact from which account?"
+  exit 1
+fi
+
+opts=(--from "$ETH_FROM" --data "$1")
+[ -n "$ETH_KEYSTORE" ] && opts+=(--key-store "$ETH_KEYSTORE")
+[ -n "$ETH_PASSWORD" ] && opts+=(--passphrase-file "$ETH_PASSWORD")
+ethsign msg "${opts[@]}"

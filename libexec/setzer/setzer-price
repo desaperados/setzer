@@ -19,7 +19,5 @@
 ### See `setzer pairs' for a list of supported pairs
 set -e
 [ $# -gt 0 ] || setzer --bad-usage "$0"
-pair="${1,,}" && [[ "${pair,,}" != *"usd" ]] && pair="${pair}usd"
-[[ ! -e "$0-$pair" ]] && echo "Error: $1 - not a recognised pair" && exit 1
-
+pair=$(setzer --pair "$1")
 exec "$0-$pair" "${@:2}"

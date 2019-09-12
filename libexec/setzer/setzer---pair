@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+pair="${1,,}"
+[[ "${pair,,}" != *"usd" ]] && pair="${pair}usd"
+file="${0%--*}price-$pair"
+if [[ ! -e "$file" ]]; then
+  echo >&2 "Error: $1 - not a recognised pair"
+  exit 1
+fi
+echo "$pair"

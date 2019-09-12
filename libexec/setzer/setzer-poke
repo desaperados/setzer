@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+### setzer-poke -- Poke a medianizer with latest prices
+### Usage: setzer poke <address>
+set -ex
+[ $# -gt 0 ] || setzer --bad-usage "$0"
+oracle=$(seth --to-address "$1")
+pair=$(seth call "$oracle" 'wat()')
+pair=$(setzer --to-ascii "$pair")
+pair=$(setzer --pair "$pair")
+
+latest=$(setzer latest "$pair" | jq -s '.')
+length=$(echo "$latest" | jq '.|length')
+
+if [[ $length -lt "$SETZER_QUORUM" ]]
+then
+  echo >&2 "Error: insufficient price data ($length of $SETZER_QUORUM)"
+  exit 1
+fi
+
+while read -r sign price timestamp; do
+  ps+=$price
+  ts+=$timestamp
+  vs+="${sign:0:64}"
+  rs+="${sign:64:64}"
+  ss+="$(seth --to-word "0x${sign:128:2}")"
+done <<<"$(echo "$latest" | jq -r '.[] | [.content.sig, .content.data.price, .content.data.timestamp] | @tsv')"
+
+sig="poke(uint256[] memory,uint256[] memory,uint8[] memory,bytes32[] memory,bytes32[] memory)"
+seth send "$oracle" "$sig" "$ps" "$ts" "$vs" "$rs" "$ss"

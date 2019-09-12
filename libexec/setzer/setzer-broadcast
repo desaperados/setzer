@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+### setzer-broadcast -- Broadcast signed prices to the network
+### Usage: setzer broadcast <pair>
+set -e
+[[ "$1" ]] && pair=$(setzer --pair "$1")
+
+_jq()   { echo "$msg" | jq -r ".value$1"; }
+_date() { printf '%(%Y-%m-%d %H:%M:%S)T\n' $(( ${1::13} / 1000 )); }
+clean() { pkill -f setzer-broadcast; }
+
+trap clean SIGINT
+
+if [[ -n "$pair" ]]
+then
+  while true
+  do
+    price=$(setzer price "$pair" median)
+    msg=$(setzer ssb publish "$pair" "$price" "median")
+    echo "$( _date "$(_jq '.timestamp')") ${pair^^} $(_jq '.content.price')"
+    sleep "$SETZER_BROADCAST_INTERVAL"
+  done
+else
+  for pair in $(setzer pairs)
+  do
+    echo "$pair: $(setzer sources "$pair" | paste -sd " " -)"
+    setzer-broadcast "$pair" >> "$SETZER_DIR/broadcast.log" 2>&1 &
+    sleep 2
+  done
+  tail -f "$SETZER_DIR/broadcast.log"
+fi

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+### setzer-broadcasts -- List latest broadcasts for a given pair
+### Usage: setzer broadcasts <pair>
+set -e
+[ $# -gt 0 ] || setzer --bad-usage "$0"
+pair=$(setzer --pair "$1")
+
+setzer ssb latest "${pair^^}"
