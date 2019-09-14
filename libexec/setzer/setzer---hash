@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -e
+wat=$1
+wad=$2
+era=$3
+
+wat=$(seth --to-bytes32 "$(seth --from-ascii "${wat,,}")")
+wad=$(seth --to-word "$(seth --to-wei "$wad" eth)")
+era=$(seth --to-word "$era")
+
+seth keccak 0x"$wad$era$wat"

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+### setzer-deploy -- Deploy a new oracle contract
+### Usage: setzer deploy <pair> [<quorum>]
+set -e
+[ $# -eq 1 ] || setzer --bad-usage "$0"
+pair=$(setzer --pair "$1")
+median=$(dirname "$0")/../../lib/median
+
+#TODO set initial bar to SETZER_QUORUM, remove toll
+
+tmp=$(mktemp -d)
+mkdir "$tmp"/src
+cp "$median/src/median.sol" "$tmp"/src
+cd "$tmp"
+sed -i -e "s/ethusd/${pair,,}/" src/median.sol
+dapp build --extract
+ETH_GAS=1800000 dapp create Median

@@ -1,29 +1,43 @@
 #!/usr/bin/env bash
 ### setzer-poke -- Poke a medianizer with latest prices
 ### Usage: setzer poke <address>
-set -ex
+set -e
 [ $# -gt 0 ] || setzer --bad-usage "$0"
 oracle=$(seth --to-address "$1")
 pair=$(seth call "$oracle" 'wat()')
 pair=$(setzer --to-ascii "$pair")
 pair=$(setzer --pair "$pair")
 
-latest=$(setzer latest "$pair" | jq -s '.')
-length=$(echo "$latest" | jq '.|length')
+msgs=$(setzer latest "$pair" | jq -s '.|sort_by(.price)')
+size=$(echo "$msgs" | jq '.|length')
 
-if [[ $length -lt "$SETZER_QUORUM" ]]
+if [[ $size -lt "$SETZER_QUORUM" ]]
 then
-  echo >&2 "Error: insufficient price data ($length of $SETZER_QUORUM)"
+  echo >&2 "Error: insufficient price data ($size of $SETZER_QUORUM)"
   exit 1
 fi
 
-while read -r sign price timestamp; do
-  ps+=$price
-  ts+=$timestamp
-  vs+="${sign:0:64}"
-  rs+="${sign:64:64}"
-  ss+="$(seth --to-word "0x${sign:128:2}")"
-done <<<"$(echo "$latest" | jq -r '.[] | [.content.sig, .content.data.price, .content.data.timestamp] | @tsv')"
+age=$(seth --to-dec "$(seth call "$oracle" 'age()')")
 
-sig="poke(uint256[] memory,uint256[] memory,uint8[] memory,bytes32[] memory,bytes32[] memory)"
-seth send "$oracle" "$sig" "$ps" "$ts" "$vs" "$rs" "$ss"
+era()
+{
+  if [[ $age -gt "$(seth --to-dec "$1")" ]]
+  then
+    echo >&2 "Error: oracle already poked: $(printf '%(%Y-%m-%d %H:%M:%S)T\n' "$age")"
+    exit 1
+  fi
+  echo "$1"
+}
+
+while read -r sig val timestamp; do
+  vals+=("$val")
+  eras+=("$(era "$timestamp")")
+  v__s+=("$(seth --to-word "0x${sig:130:2}")")
+  r__s+=("${sig:2:64}")
+  s__s+=("${sig:66:64}")
+done <<<"$(echo "$msgs" | jq -r '.[] | [.content.sig, .content.data.price, .content.data.timestamp] | @tsv')"
+
+IFS=","
+f="poke(uint256[] memory,uint256[] memory,uint8[] memory,bytes32[] memory,bytes32[] memory)"
+ETH_GAS=${ETH_GAS:-500000} seth send "$oracle" "$f" \
+  "[${vals[*]}]" "[${eras[*]}]" "[${v__s[*]}]" "[${r__s[*]}]" "[${s__s[*]}]"

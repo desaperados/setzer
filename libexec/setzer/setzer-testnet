@@ -1,22 +1,32 @@
 #!/usr/bin/env bash
 set -e
 
+[[ $(pgrep -fq dapp-testnet) -eq 1 ]] && pkill -f dapp-testnet
+
+dapp testnet &
+pid="$!"
+echo $pid
+echo "Background jobs: $(jobs) "
+
+from=$(seth accounts ls | sed 1q | awk '{print substr ($0, 0, 42)}')
+
 export ETH_RPC_URL=http://127.0.0.1:8545
 export ETH_KEYSTORE=$HOME/.dapp/testnet/8545/keystore
-export ETH_FROM=$(seth accounts ls | sed 1q | awk '{print substr ($0, 0, 42)}')
+export ETH_FROM=$from
 export ETH_PASSWORD=/dev/null
 
-cd "$HOME/dev/median"
-dapp build --extract
-med=$(ETH_GAS=2000000 dapp create Median)
-cd $(pwd)
-seth send $med 'lift(address)' $ETH_FROM
+oracle=$(setzer deploy eth)
+seth send "$oracle" 'lift(address)' "$ETH_FROM"
 
-echo "export MEDIANIZER=$med"
-echo "export ETH_FROM=$ETH_FROM"
-echo "export ETH_KEYSTORE=$ETH_KEYSTORE"
-echo "export ETH_RPC_URL=$ETH_RPC_URL"
-echo "export ETH_PASSWORD=$ETH_PASSWORD"
+cat <<.
+export ETH_RPC_URL=$ETH_RPC_URL
+export ETH_FROM=$ETH_FROM
+export ETH_KEYSTORE=$ETH_KEYSTORE
+export ETH_PASSWORD=$ETH_PASSWORD
+
+export TESTNET_ORACLE=$oracle
+export SETZER_QUORUM=1
+.
 
 # export SETZER_QUORUM=1
 # export ssb_appname="ssb-testnet"

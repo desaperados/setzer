@@ -29,6 +29,13 @@ while [[ $1 ]]; do
   esac; shift
 done
 
+#TODO gas argument?
+#TODO spread checking
+#TODO Readme & help
+#TODO testnet
+#TODO per asset config
+#TODO pokebot - like broadcast bot
+
 export SETZER_DIR=${SETZER_DIR:-$HOME/.setzer}
 export SETZER_CACHE_EXPIRY=${SETZER_CACHE_EXPIRY:-60}
 export SETZER_TIMEOUT=${SETZER_TIMEOUT:-10}

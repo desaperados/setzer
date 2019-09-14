@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 ### setzer-latest -- Latest valid price messages for a pair
 ### Usage: setzer latest <pair> [address]
-###
-### TODO
-### Filter invalid authors if an oracle is provided
 set -e
 [ $# -gt 0 ] || setzer --bad-usage "$0"
 pair=$(setzer --pair "$1")
+[[ "$2" ]] && oracle=$(seth --to-address "$2")
 
 previous()
 {
@@ -26,13 +24,17 @@ valid()
     if [[ ! $authors = *"$a"* ]]
     then
       authors+=$a
-      echo "$1" | jq '.'
-    else
-      echo "$1" | jq '.'
+      setzer --valid-message "$1" "$oracle"
     fi
 }
 
-msg=$(head -n 1 <(setzer ssb latest "${pair^^}" | jq -c '.|.value'))
-key=$(echo "$msg" | jq -r '.previous')
-valid "$msg"
-previous 2 "$key"
+msg=$(head -n 1 <(setzer ssb messages "${pair^^}" | jq -c '.|.value'))
+if [[ -n "$msg" ]]
+then
+  key=$(echo "$msg" | jq -r '.previous')
+  valid "$msg"
+  previous 2 "$key"
+else
+  echo >&2 "Error: no valid $pair prices"
+  exit 1
+fi

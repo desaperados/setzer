@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+pair=$1; price=$2; src=$3
+
+now=$(date +"%s")
+kec=$(setzer --hash "$pair" "$price" "$now")
+sig=$(setzer --sign "$kec")
+
+jq -n \
+--arg val "$price" \
+--arg typ "${pair^^}" \
+--arg sig "$sig" \
+--arg src "$src" \
+--arg wad "$(seth --to-word "$(seth --to-wei "$price" eth)")" \
+--arg era "$(seth --to-word "$now")" \
+'{
+  "type": $typ,
+  "price": $val,
+  "source": $src,
+  "sig": $sig,
+  "data": {
+    "price": $wad,
+    "timestamp": $era
+  }
+}'

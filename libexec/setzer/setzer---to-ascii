@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2001
 hexdata=$(seth --to-hexdata "$@")
 format=$(sed 's/../\\x&/g' <<<"${hexdata#0x}")
 echo -e "$format" | tr -d "\r\n\0"

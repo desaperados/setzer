@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 p1=${1:-8008}
-p2=$(( $p1 + 100 ))
+p2=$(( p1 + 100 ))
 json=$(jq -n --arg port1 "$p1" --arg port2 "$p2" \
 '{
   "caps": {

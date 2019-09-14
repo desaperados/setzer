@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -e
+msg="$1"
+med="$2"
+
+_jq() { echo "$msg" | jq -r ".content$1"; }
+
+if [[ -n "$med" ]]
+then
+  pair=$(_jq '.type')
+  timestamp=$(seth --to-dec "$(_jq '.data.timestamp')")
+  hash=$(setzer --hash "${pair}" "$(_jq '.price')" "$timestamp")
+  signer=$(ethsign recover --data "$hash" --sig "$(_jq '.sig')")
+  valid=$(seth call "$med" 'orcl(address)' "$signer")
+  if [[ $(seth --to-dec "$valid") -eq 1 ]]; then
+    echo "$msg" | jq '.'
+  fi
+else
+  echo "$msg" | jq '.'
+fi
