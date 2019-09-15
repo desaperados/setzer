@@ -8,13 +8,14 @@ pair=$(setzer --pair "$1")
 
 previous()
 {
-    local msg; local key
+    local msg; local key; local inc; inc=$1
     msg=$(setzer ssb get "$2")
-    valid "$msg"
-    if [ "$1" -lt "$SETZER_QUORUM" ]
+    json=$(valid "$msg")
+    [[ -n "$json" ]] && ((inc++)) && echo "$json"
+    if [ "$inc" -lt "$SETZER_QUORUM" ]
     then
       key=$(echo "$msg" | jq -r '.previous')
-      previous $(($1 + 1)) "$key"
+      previous $inc "$key"
     fi
 }
 
