@@ -97,7 +97,6 @@ Install via make:
 
 ## Todo
 
-* Pass multiple pairs to broadcast
 * Specify asset pairs via config file
 * CLI `seth` --options, env `--options`
 * Poke bot

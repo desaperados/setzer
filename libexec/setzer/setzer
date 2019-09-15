@@ -8,6 +8,8 @@ set -e
 OPTS="setzer [<options>] <command> [<args>]
 --
   Options:
+interval=seconds      broadcast interval
+  Ethereum options:
 F,from=address        account to send from
 keystore=dir          local keystore directory
 "
@@ -23,8 +25,11 @@ eval "$(git rev-parse --parseopt -- "$@" <<<"$OPTS" || echo exit $?)"
 while [[ $1 ]]; do
   case $1 in
     --)             shift; break;;
+
     --keystore)     shift; export ETH_KEYSTORE=$1;;
     -F|--from)      shift; export ETH_FROM=$1;;
+
+    --interval)     shift; export SETZER_BROADCAST_INTERVAL=$1;;
     *) printf "${0##*/}: unrecognised option: %q\n" "--$1"; exit 1
   esac; shift
 done
