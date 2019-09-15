@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-### setzer-price -- Show price(s) for a given asset or pair
+### setzer-price -- Fetch exchange price(s) for a given asset or pair
 ### Usage: setzer price <pair> [<command>]
 ###
 ### Commands:

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-### setzer-ssb -- SSB Server
 set -e
 
 command -v ssb-server >/dev/null 2>&1 || {

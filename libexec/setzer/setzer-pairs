@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-### setzer-pairs -- List all supported pairs
+### setzer-pairs -- List all supported price pairs
 ### Usage: setzer pairs
 set -e
 for file in "${0%/*}"/setzer-price-*; do

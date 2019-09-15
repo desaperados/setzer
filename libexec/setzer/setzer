@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 ### setzer -- collateral price feeds
-### Usage: setzer <command> [<args>]
+### Usage: setzer [<opts>] <command> [<args>]
 ###    or: setzer <command> --help
 ###
-### Setzer: Query USD price feeds
+### Setzer: Publish signed prices to Ethereum
 set -e
 OPTS="setzer [<options>] <command> [<args>]
 --
@@ -28,13 +28,6 @@ while [[ $1 ]]; do
     *) printf "${0##*/}: unrecognised option: %q\n" "--$1"; exit 1
   esac; shift
 done
-
-#TODO gas argument?
-#TODO spread checking
-#TODO Readme & help
-#TODO testnet
-#TODO per asset config
-#TODO pokebot - like broadcast bot
 
 export SETZER_DIR=${SETZER_DIR:-$HOME/.setzer}
 export SETZER_CACHE_EXPIRY=${SETZER_CACHE_EXPIRY:-60}

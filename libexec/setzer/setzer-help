@@ -3,7 +3,7 @@
 ### Usage: setzer help [<command>]
 ###    or: setzer <command> --help
 
-BUGS=https://github.com/makerdao/setzer-mcd/issues
+BUGS=https://github.com/makerdao/setzer/issues
 
 name=setzer
 file=${0%-*}${1+-$1}

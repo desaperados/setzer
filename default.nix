@@ -2,7 +2,7 @@
 , coreutils, curl, jshon, bc, gnused, perl, datamash, git }:
 
 stdenv.mkDerivation rec {
-  name = "setzer-mcd-${version}";
+  name = "setzer-${version}";
   version = "0.1.0";
   src = ./.;
 

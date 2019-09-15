@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
-### setzer-broadcast -- Broadcast signed prices to the network
-### Usage: setzer broadcast <pair>
+### setzer-broadcast -- Broadcast signed prices over ssb
+### Usage: setzer broadcast [<opts>] [--interval] [<pairs>]
+###
+### Continously publish signed prices to ssb.
+### TODO document ETH_FROM options.
+###
+### With `--interval', override the default update interval
 set -e
 [[ "$1" ]] && pair=$(setzer --pair "$1")
 

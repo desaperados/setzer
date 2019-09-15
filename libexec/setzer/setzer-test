@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-### setzer-test -- Test all price feeds
+### setzer-test -- Test all price sources
 ### Usage: setzer test
 set -e
 rm -rf "$SETZER_CACHE"
