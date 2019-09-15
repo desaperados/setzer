@@ -40,7 +40,7 @@ case $1 in
   };;
   messages) {
     now=$(( $(date +'%s * 1000 + %-N / 1000000') ))
-    then=$(( now - ("$SETZER_MSG_EXPIRY" * 1000) ))
+    then=$(( now - ("$SETZER_BROADCAST_AGE" * 1000) ))
     ssb-server messagesByType --type "$2" --gte "$then" --reverse
   };;
   "") {

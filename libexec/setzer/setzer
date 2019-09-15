@@ -4,14 +4,40 @@
 ###    or: setzer <command> --help
 ###
 ### Setzer: Publish signed prices to Ethereum
+###
+### Broadcast options:
+###
+###    --interval=<seconds>       broadcast interval
+###
+### Poke options:
+###
+###    --age=<seconds>            max. price message age
+###    --quorum=<number>          min. valid prices to update oracle
+###
+### Ethereum options:
+###
+###    -F, --from=<sender>        account to send transaction from
+###    -G, --gas=<number>         number of gas units to provide
+###    -P, --gas-price=<number>   price (in wei) of each gas unit
+###    -S, --password=<file>      password for non-interactive signing
+###
+###    --rpc-url=<url>            JSON-RPC URL (overrides host and port)
+###    --keystore=<dir>           local keystore directory
 set -e
 OPTS="setzer [<options>] <command> [<args>]
 --
   Options:
-interval=seconds      broadcast interval
+interval=seconds     broadcast interval
+age=seconds          max. price message age
+quorum=number        min. valid prices to update oracle
+
   Ethereum options:
-F,from=address        account to send from
-keystore=dir          local keystore directory
+F,from=address       account to send transaction from
+G,gas=n              number of gas units to provide
+P,gas-price=n        price (in wei) of each gas unit
+S,password=file      password for non-interactive signing
+rpc-url=url          JSON-RPC URL
+keystore=dir         local keystore directory
 "
 
 if [[ $2 = --help ]]; then
@@ -26,10 +52,17 @@ while [[ $1 ]]; do
   case $1 in
     --)             shift; break;;
 
-    --keystore)     shift; export ETH_KEYSTORE=$1;;
-    -F|--from)      shift; export ETH_FROM=$1;;
-
     --interval)     shift; export SETZER_BROADCAST_INTERVAL=$1;;
+    --age)          shift; export SETZER_BROADCAST_AGE=$1;;
+    --quorum)       shift; export SETZER_QUORUM=$1;;
+
+    -F|--from)       shift; export ETH_FROM=$1;;
+    -G|--gas)        shift; export ETH_GAS=$1;;
+    -P|--gas-price)  shift; export ETH_GAS_PRICE=$1;;
+    -S|--password)   shift; export ETH_PASSWORD=$1;;
+    --rpc-url)       shift; export ETH_RPC_URL=$1;;
+    --keystore)      shift; export ETH_KEYSTORE=$1;;
+
     *) printf "${0##*/}: unrecognised option: %q\n" "--$1"; exit 1
   esac; shift
 done
@@ -38,7 +71,7 @@ export SETZER_DIR=${SETZER_DIR:-$HOME/.setzer}
 export SETZER_CACHE_EXPIRY=${SETZER_CACHE_EXPIRY:-60}
 export SETZER_TIMEOUT=${SETZER_TIMEOUT:-10}
 export SETZER_MIN_MEDIAN=${SETZER_MIN_MEDIAN:-3}
-export SETZER_MSG_EXPIRY=${SETZER_MSG_EXPIRY:-900}
+export SETZER_BROADCAST_AGE=${SETZER_BROADCAST_AGE:-900}
 export SETZER_BROADCAST_INTERVAL=${SETZER_BROADCAST_INTERVAL:-120}
 export SETZER_QUORUM=${SETZER_QUORUM:-10}
 

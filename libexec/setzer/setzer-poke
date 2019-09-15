@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ### setzer-poke -- Poke an on-chain oracle with latest prices
-### Usage: setzer poke <address>
+### Usage: setzer poke [<opts>] <address>
 set -e
 [ $# -gt 0 ] || setzer --bad-usage "$0"
 oracle=$(seth --to-address "$1")

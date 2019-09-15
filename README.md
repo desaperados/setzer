@@ -79,6 +79,7 @@ Dependencies:
 * [jshon](http://kmkeen.com/jshon/)
 * [Jq](https://stedolan.github.io/jq/)
 * GNU `timeout`
+* [ssb](https://github.com/ssbc/ssb-server)
 
 Install via make:
 
@@ -91,14 +92,13 @@ Install via make:
 * `SETZER_DIR` - Tmp cache directory (default: ~/.setzer)
 * `SETZER_CACHE_EXPIRY` - Price fetch cache expiry (default: 60) sec.
 * `SETZER_TIMEOUT` - HTTP request timeout (default: 10) sec.
-* `SETZER_MSG_EXPIRY` - Price broadcast validity (default: 900) 15 min.
+* `SETZER_BROADCAST_AGE` - Max. price broadcast validity (default: 900) 15 min.
 * `SETZER_BROADCAST_INTERVAL` Price broadcast interval (default: 120) 2 min.
 * `SETZER_QUORUM` Min. signed prices required to update an oracle
 
 ## Todo
 
 * Specify asset pairs via config file
-* CLI `seth` --options, env `--options`
 * Poke bot
 * Remove `toll`
 * Pass quorum to deploy
