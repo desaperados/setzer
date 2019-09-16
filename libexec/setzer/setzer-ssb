@@ -25,9 +25,6 @@ case $1 in
   server) {
     ssb-server getAddress
   };;
-  logs) {
-    tail -f "$HOME/.$ssb_appname/server.logs"
-  };;
   stop) {
     if [[ -n "$(pgrep -f "ssb-server start")" ]]; then
       log "Stopping ssb-server [$ssb_appname]"

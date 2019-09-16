@@ -6,19 +6,6 @@ set -e
 pair=$(setzer --pair "$1")
 [[ "$2" ]] && oracle=$(seth --to-address "$2")
 
-previous()
-{
-    local msg; local key; local inc; inc=$1
-    msg=$(setzer ssb get "$2")
-    json=$(valid "$msg")
-    [[ -n "$json" ]] && ((inc++)) && echo "$json"
-    if [ "$inc" -lt "$SETZER_QUORUM" ]
-    then
-      key=$(echo "$msg" | jq -r '.previous')
-      previous $inc "$key"
-    fi
-}
-
 valid()
 {
     a=$(echo "$1" | jq -r '.author')
@@ -29,13 +16,14 @@ valid()
     fi
 }
 
-msg=$(head -n 1 <(setzer ssb messages "${pair^^}" | jq -c '.|.value'))
-if [[ -n "$msg" ]]
-then
-  key=$(echo "$msg" | jq -r '.previous')
-  valid "$msg"
-  previous 2 "$key"
-else
-  echo >&2 "Error: no valid $pair prices"
-  exit 1
-fi
+inc=0
+for msg in $(setzer ssb messages "${pair^^}" | jq -c '.|.value'); do
+
+  msg=$(valid "$msg")
+  if [[ -n "$msg" ]]; then
+    inc=$((inc+1))
+    echo $msg | jq '.'
+  fi
+
+  [[ "$inc" -eq "$SETZER_QUORUM" ]] && break
+done

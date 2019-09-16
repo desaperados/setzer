@@ -13,8 +13,8 @@ then
   signer=$(ethsign recover --data "$hash" --sig "$(_jq '.sig')")
   valid=$(seth call "$med" 'orcl(address)' "$signer")
   if [[ $(seth --to-dec "$valid") -eq 1 ]]; then
-    echo "$msg" | jq '.'
+    echo "$msg"
   fi
 else
-  echo "$msg" | jq '.'
+  echo "$msg"
 fi
