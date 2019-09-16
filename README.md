@@ -143,7 +143,5 @@ Install via make:
 * Set poke quorum via oracle
 * Specify asset pairs via config file
 * Poke bot
-* Remove `toll`
-* Pass quorum to deploy
 * Nix | dapp.tools install
 * Remove jshon
