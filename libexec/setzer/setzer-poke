@@ -8,22 +8,29 @@ pair=$(seth call "$oracle" 'wat()')
 pair=$(setzer --to-ascii "$pair")
 pair=$(setzer --pair "$pair")
 
+bar=$(seth --to-dec "$(seth call "$oracle" 'bar()')")
+export SETZER_QUORUM=$bar
+
+age=$(seth --to-dec "$(seth call "$oracle" 'age()')")
+export SETZER_AGE=$age
+
 msgs=$(timeout "$SETZER_TIMEOUT" setzer latest "$pair" | jq -s '.|sort_by(.price)')
 size=$(echo "$msgs" | jq '.|length')
 
 if [[ $size -lt "$SETZER_QUORUM" ]]
 then
-  echo >&2 "Error: insufficient price data ($size of $SETZER_QUORUM)"
+  _age=$(printf '%(%Y-%m-%d %H:%M:%S)T\n' "$age")
+  _ago=$(( $(date +"%s") - age ))
+  echo >&2 "${0##*/}: Error: insufficient price data ($size of $SETZER_QUORUM)"
+  echo >&2 "${0##*/}: Oracle last poked: $_age ($_ago seconds ago)"
   exit 1
 fi
-
-age=$(seth --to-dec "$(seth call "$oracle" 'age()')")
 
 era()
 {
   if [[ $age -gt "$(seth --to-dec "$1")" ]]
   then
-    echo >&2 "Error: oracle already poked: $(printf '%(%Y-%m-%d %H:%M:%S)T\n' "$age")"
+    echo >&2 "Error: stale price"
     exit 1
   fi
   echo "$1"

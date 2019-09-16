@@ -9,9 +9,8 @@
 ###
 ###    --interval=<seconds>       broadcast interval
 ###
-### Poke options:
+### Deploy options:
 ###
-###    --age=<seconds>            max. price message age
 ###    --quorum=<number>          min. valid prices to update oracle
 ###
 ### Ethereum options:
@@ -28,7 +27,6 @@ OPTS="setzer [<options>] <command> [<args>]
 --
   Options:
 interval=seconds     broadcast interval
-age=seconds          max. price message age
 quorum=number        min. valid prices to update oracle
 
   Ethereum options:
@@ -53,7 +51,6 @@ while [[ $1 ]]; do
     --)             shift; break;;
 
     --interval)     shift; export SETZER_BROADCAST_INTERVAL=$1;;
-    --age)          shift; export SETZER_BROADCAST_AGE=$1;;
     --quorum)       shift; export SETZER_QUORUM=$1;;
 
     -F|--from)       shift; export ETH_FROM=$1;;
@@ -71,9 +68,9 @@ export SETZER_DIR=${SETZER_DIR:-$HOME/.setzer}
 export SETZER_CACHE_EXPIRY=${SETZER_CACHE_EXPIRY:-60}
 export SETZER_TIMEOUT=${SETZER_TIMEOUT:-10}
 export SETZER_MIN_MEDIAN=${SETZER_MIN_MEDIAN:-3}
-export SETZER_BROADCAST_AGE=${SETZER_BROADCAST_AGE:-900}
+export SETZER_MSG_AGE=${SETZER_MSG_AGE:-900}
 export SETZER_BROADCAST_INTERVAL=${SETZER_BROADCAST_INTERVAL:-120}
-export SETZER_QUORUM=${SETZER_QUORUM:-10}
+export SETZER_QUORUM=${SETZER_QUORUM:-1}
 
 export SETZER_CACHE="$SETZER_DIR/cache"
 export SETZER_PIDS="$SETZER_DIR/pids"

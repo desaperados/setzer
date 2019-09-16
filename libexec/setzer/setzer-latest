@@ -22,7 +22,7 @@ for msg in $(setzer ssb messages "${pair^^}" | jq -c '.|.value'); do
   msg=$(valid "$msg")
   if [[ -n "$msg" ]]; then
     inc=$((inc+1))
-    echo $msg | jq '.'
+    echo "$msg" | jq '.'
   fi
 
   [[ "$inc" -eq "$SETZER_QUORUM" ]] && break

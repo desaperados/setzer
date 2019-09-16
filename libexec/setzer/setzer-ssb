@@ -36,9 +36,13 @@ case $1 in
     setzer --to-msg "$pair" "$price" "$src" | ssb-server publish .
   };;
   messages) {
-    now=$(( $(date +'%s * 1000 + %-N / 1000000') ))
-    then=$(( now - ("$SETZER_BROADCAST_AGE" * 1000) ))
-    ssb-server messagesByType --type "$2" --gte "$then" --reverse
+    if [[ "$SETZER_AGE" ]]; then
+      age=$(( "$SETZER_AGE" * 1000))
+    else
+      now=$(( $(date +'%s * 1000 + %-N / 1000000') ))
+      age=$(( now - ("$SETZER_MSG_AGE" * 1000) ))
+    fi
+    ssb-server messagesByType --type "$2" --gte "$age" --reverse
   };;
   "") {
     setzer help ssb

@@ -36,7 +36,7 @@ then
   done
 elif [[ $# -eq 0 ]]
 then
-  broadcast $(setzer pairs)
+  broadcast "$(setzer pairs)"
 else
   broadcast "$@"
 fi

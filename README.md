@@ -44,6 +44,30 @@ __setzer poke__ ``<address>``
 * Pokes an on-chain oracle at a given address.
 * Retrieves the `pair`, `quorum`, and `age` from the oracle and queries the ssb network for valid price data. If sufficient fresh price data is available from feeds trusted by the oracle, a `poke` transaction is submitted to update the on-chain price.
 
+## Price sources
+
+List price sources for any given pair with `sources`
+
+```bash
+$ setzer sources btcusd
+binance
+bitfinex
+bitstamp
+coinbase
+gemini
+kraken
+upbit
+```
+
+Specify the `source` to get a price from a particular exchange. Without a `source` all sources are queried and the median is returned. __Broadcast publishes the median price__.
+```bash
+$ setzer price btc binance
+10368.1388898810
+
+$ setzer price btc
+10304.4800000000
+```
+
 ## Demo
 
 ```bash
@@ -78,32 +102,7 @@ seth-send: Waiting for transaction receipt...
 seth-send: Transaction included in block 81.
 ```
 
-## Price sources
-
-List price sources for any given pair with `sources`
-
-```bash
-$ setzer sources btcusd
-binance
-bitfinex
-bitstamp
-coinbase
-gemini
-kraken
-upbit
-```
-
-Specify the `source` to get a price from a particular exchange. Without a `source` all sources are queried and the median is returned. __Broadcast publishes the median price__.
-```bash
-$ setzer price btc binance
-10368.1388898810
-
-$ setzer price btc
-10304.4800000000
-```
-
-
-## Not addressed
+## Not included
 
 * Price signer governance
 * Rewards
@@ -134,13 +133,11 @@ Install via make:
 * `SETZER_DIR` - Tmp cache directory (default: ~/.setzer)
 * `SETZER_CACHE_EXPIRY` - Price fetch cache expiry (default: 60) sec.
 * `SETZER_TIMEOUT` - HTTP request timeout (default: 10) sec.
-* `SETZER_BROADCAST_AGE` - Max. price broadcast validity (default: 900) 15 min.
 * `SETZER_BROADCAST_INTERVAL` Price broadcast interval (default: 120) 2 min.
 * `SETZER_QUORUM` Min. signed prices required to update an oracle
 
 ## Todo
 
-* Set poke quorum via oracle
 * Specify asset pairs via config file
 * Poke bot
 * Nix | dapp.tools install
