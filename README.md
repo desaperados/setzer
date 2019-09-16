@@ -5,7 +5,7 @@ Publish signed prices to an Ethereum oracle.
 <img width="1220" alt="Screen Shot 2019-09-16 at 9 10 43 AM" src="https://user-images.githubusercontent.com/5028/64927675-f1b35580-d861-11e9-8ade-27b694b87fd8.png">
 
 
-## Usage
+## Commands
 
 ```
 Usage: setzer [<opts>] <command> [<args>]
@@ -23,6 +23,26 @@ Commands:
    sources         Show price sources for a given asset or pair
    test            Test all price sources
 ```
+
+## Basic usage
+
+__setzer deploy__ `[--quorum] <pair>`
+
+* Deploys the MakerDAO [medianizer](https://github.com/makerdao/median/blob/master/src/median.sol) contract with the `toll` modifier removed to allow anyone to read prices from the oracle.
+* The initial quorum (`bar`) required to push new prices to the contract is set to 1 by default or `--quorum=<number>` if provided.
+
+__setzer broadcast__ `[--interval] [--follow] [<pair>]`
+
+* Continuously broadcasts prices over the setzer ssb network at a given `interval`.
+* Prices are signed with an Ethereum key, allowing message authenticity to be verified.
+* `pair` can be singular e.g `ethusd` or a space-separated list of pairs. If no pairs are specified, all `setzer pairs` will be used.
+* `pair` is assumed to ba a USD pair and can be upper or lowercase, with or without quote appended e.g ETH or ETHUSD.
+* Broadcast will run in the background unless `--follow` is specified.
+
+__setzer poke__ ``<address>``
+
+* Pokes an on-chain oracle at a given address.
+* Retrieves the `pair`, `quorum`, and `age` from the oracle and queries the ssb network for valid price data. If sufficient fresh price data is available from feeds trusted by the oracle, a `poke` transaction is submitted to update the on-chain price.
 
 ## Demo
 
@@ -58,14 +78,36 @@ seth-send: Waiting for transaction receipt...
 seth-send: Transaction included in block 81.
 ```
 
-## Features
+## Price sources
 
-* Medianizer with no `toll`
+List price sources for any given pair with `sources`
 
-## Future work
+```bash
+$ setzer sources btcusd
+binance
+bitfinex
+bitstamp
+coinbase
+gemini
+kraken
+upbit
+```
 
-* Price feed governance
+Specify the `source` to get a price from a particular exchange. Without a `source` all sources are queried and the median is returned. __Broadcast publishes the median price__.
+```bash
+$ setzer price btc binance
+10368.1388898810
+
+$ setzer price btc
+10304.4800000000
+```
+
+
+## Not addressed
+
+* Price signer governance
 * Rewards
+* ssb invites
 
 ## Installation
 
@@ -98,6 +140,7 @@ Install via make:
 
 ## Todo
 
+* Set poke quorum via oracle
 * Specify asset pairs via config file
 * Poke bot
 * Remove `toll`
