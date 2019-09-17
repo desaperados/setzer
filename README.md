@@ -31,13 +31,12 @@ __setzer deploy__ `[--quorum] <pair>`
 * Deploys the MakerDAO [medianizer](https://github.com/makerdao/median/blob/master/src/median.sol) contract with the `toll` modifier removed to allow anyone to read prices from the oracle.
 * The initial quorum (`bar`) required to push new prices to the contract is set to 1 by default or `--quorum=<number>` if provided.
 
-__setzer broadcast__ `[--interval] [--follow] [<pair>]`
+__setzer broadcast__ `[--interval] [<pair>]`
 
 * Continuously broadcasts prices over the setzer ssb network at a given `interval`.
 * Prices are signed with an Ethereum key, allowing message authenticity to be verified.
 * `pair` can be singular e.g `ethusd` or a space-separated list of pairs. If no pairs are specified, all `setzer pairs` will be used.
 * `pair` is assumed to ba a USD pair and can be upper or lowercase, with or without quote appended e.g ETH or ETHUSD.
-* Broadcast will run in the background unless `--follow` is specified.
 
 __setzer poke__ ``<address>``
 
@@ -85,7 +84,7 @@ $ ORACLE=$(setzer deploy ETHUSD --quorum 1)
 $ seth send $ORACLE 'lift(address)' $ETH_FROM
 
 # Broadcast signed prices
-$ setzer broadcast --interval 120 ETHUSD
+$ setzer broadcast ETHUSD --interval 120
 2019-09-16 07:44:03 ETHUSD 188.9850000000
 2019-09-16 07:46:15 ETHUSD 188.9541217800
 2019-09-16 07:48:28 ETHUSD 188.9662400800
@@ -102,10 +101,10 @@ seth-send: Waiting for transaction receipt...
 seth-send: Transaction included in block 81.
 ```
 
-## Not included
+## Not (yet) handled
 
 * Price signer governance
-* Rewards
+* Staking, Rewards
 * ssb invites
 
 ## Installation
@@ -120,6 +119,7 @@ Dependencies:
 * [jshon](http://kmkeen.com/jshon/)
 * [Jq](https://stedolan.github.io/jq/)
 * GNU `timeout`
+* [seth](https://github.com/dapphub/dapptools/tree/master/src/seth)
 * [ssb](https://github.com/ssbc/ssb-server)
 
 Install via make:
@@ -139,6 +139,5 @@ Install via make:
 ## Todo
 
 * Specify asset pairs via config file
-* Poke bot
 * Nix | dapp.tools install
 * Remove jshon

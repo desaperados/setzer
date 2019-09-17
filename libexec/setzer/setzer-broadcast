@@ -1,28 +1,13 @@
 #!/usr/bin/env bash
 ### setzer-broadcast -- Broadcast signed prices over ssb
-### Usage: setzer broadcast [<opts>] [--interval] [<pairs>]
+### Usage: setzer broadcast [<opts>] [--interval] <pair>
 ###
-### Continously publish signed prices to ssb.
+### Continously publish signed prices over ssb
 ###
 ### With `--interval', override the default update interval
 set -e
 _jq()   { echo "$msg" | jq -r ".value$1"; }
 _date() { printf '%(%Y-%m-%d %H:%M:%S)T\n' $(( ${1::13} / 1000 )); }
-clean() { pkill -f setzer-broadcast; }
-
-trap clean SIGINT
-
-broadcast()
-{
-  for pair in "$@"
-  do
-    pair=$(setzer --pair "$pair")
-    echo "$pair: $(setzer sources "$pair" | paste -sd " " -)"
-    setzer-broadcast "$pair" >> "$SETZER_DIR/broadcast.log" 2>&1 &
-    sleep 2
-  done
-  tail -f "$SETZER_DIR/broadcast.log"
-}
 
 if [[ $# -eq 1 ]]
 then
@@ -34,9 +19,6 @@ then
     echo "$( _date "$(_jq '.timestamp')") ${pair^^} $(_jq '.content.price')"
     sleep "$SETZER_BROADCAST_INTERVAL"
   done
-elif [[ $# -eq 0 ]]
-then
-  broadcast "$(setzer pairs)"
 else
-  broadcast "$@"
+  setzer broadcast-bot "$@"
 fi

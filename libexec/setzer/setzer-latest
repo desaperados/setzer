@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-### setzer-latest -- Print most recent quorum price messages for a pair
+### setzer-latest -- Print recent price messages for a pair
 ### Usage: setzer latest <pair> [address]
 set -e
 [ $# -gt 0 ] || setzer --bad-usage "$0"

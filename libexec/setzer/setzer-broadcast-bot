@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+clean() { pkill -f setzer-broadcast; }
+trap clean SIGINT;
+
+[[ $# -gt 0 ]] && pairs=( "$@" )
+[[ $# -eq 0 ]] && mapfile -t pairs < <(setzer pairs)
+
+for pair in "${pairs[@]}"
+do
+  pair=$(setzer --pair "$pair")
+  echo "$pair: $(setzer sources "$pair" | paste -sd " " -)"
+  setzer-broadcast "$pair" >> "$SETZER_DIR/broadcast.log" 2>&1 &
+  sleep 2
+done
+tail -f "$SETZER_DIR/broadcast.log"
